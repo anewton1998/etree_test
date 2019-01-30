@@ -21,11 +21,19 @@ class BasicsTest : ShouldSpec( {
         ip.end shouldBe Ipv4Address.parse( "10.0.0.0" )
     }
 
-    should( "create an IP network" ) {
+    should( "create an IP network from CIDR notation" ) {
 
         val net = IpRange.parse( "10.0.0.0/24" )
         net.start shouldBe Ipv4Address.parse( "10.0.0.0" )
         net.end shouldBe Ipv4Address.parse( "10.0.0.255" )
+
+    }
+
+    should( "create an IP network from a range" ) {
+
+        val net = IpRange.parse( "10.0.0.0-10.255.255.255" )
+        net.start shouldBe Ipv4Address.parse( "10.0.0.0" )
+        net.end shouldBe Ipv4Address.parse( "10.255.255.255" )
 
     }
 
