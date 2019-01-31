@@ -22,6 +22,21 @@ class BasicsTest : ShouldSpec( {
         ip.end shouldBe Ipv4Address.parse( "10.0.0.0" )
     }
 
+    /**
+     * Zero-padded IPv4 addresses are really not a good idea as some parsers
+     * interpret the leading zero as an octal signifier. Fortunately, this
+     * parser does not.
+     *
+     * Zero-padded IPv4 addresses are often used for lexical sorting.
+     */
+    should( "create IPv4 addresses from zero padded" ) {
+
+        val ip = Ipv4Address.parse( "010.000.000.000" )
+        ip.start shouldBe Ipv4Address.parse( "10.0.0.0" )
+        ip.end shouldBe Ipv4Address.parse( "10.0.0.0" )
+
+    }
+
     should( "create an IP network from CIDR notation" ) {
 
         val net = IpRange.parse( "10.0.0.0/24" )

@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val jackson_version = "2.9.5"
+
 plugins {
     application
     kotlin("jvm") version "1.3.20"
@@ -14,7 +16,9 @@ application {
 
 dependencies {
     compile(kotlin("stdlib"))
+    compile(kotlin("reflect"))
     compile( "net.ripe.ipresource:ipresource:1.46")
+    compile( "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version" )
 
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.2.1")
 }
