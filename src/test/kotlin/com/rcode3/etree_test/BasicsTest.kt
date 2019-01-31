@@ -5,6 +5,7 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.ShouldSpec
 import net.ripe.ipresource.IpRange
 import net.ripe.ipresource.Ipv4Address
+import net.ripe.ipresource.Ipv6Address
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy
 import net.ripe.ipresource.etree.NestedIntervalMap
 
@@ -34,6 +35,30 @@ class BasicsTest : ShouldSpec( {
         val net = IpRange.parse( "10.0.0.0-10.255.255.255" )
         net.start shouldBe Ipv4Address.parse( "10.0.0.0" )
         net.end shouldBe Ipv4Address.parse( "10.255.255.255" )
+
+    }
+
+    should( "parse IPv6 addresses" ) {
+
+        Ipv6Address.parse( "2001:db8::" )
+        Ipv6Address.parse( "::1" )
+        Ipv6Address.parse( "::" )
+        Ipv6Address.parse( "::ffff:192.0.2.128")
+
+    }
+
+    should( "parse IPv6 network in CIDR notation" ) {
+
+        val net = IpRange.parse( "2001:db8::/64" )
+        net.start shouldBe Ipv6Address.parse( "2001:db8::" )
+        net.end shouldBe Ipv6Address.parse( "2001:db8::ffff:ffff:ffff:ffff" )
+    }
+
+    should( "parse an IPv6 network as a range" ) {
+
+        val net = IpRange.parse( "2001:db8::-2001:db8::ffff:ffff:ffff:ffff")
+        net.start shouldBe Ipv6Address.parse( "2001:db8::" )
+        net.end shouldBe Ipv6Address.parse( "2001:db8::ffff:ffff:ffff:ffff" )
 
     }
 
