@@ -136,4 +136,27 @@ class BasicsTest : ShouldSpec( {
         map.findAllLessSpecific( IpRange.parse( "10.0.0.0/20" ) ) shouldContain "net10_0_16_b"
     }
 
+    should( "combine IPv4 and IPv6 ranges into a single map" ) {
+
+        val map = NestedIntervalMap<IpRange,String>( IpResourceIntervalStrategy.getInstance() )
+
+        // define networks - one inside the other
+        val net10_16 = IpRange.parse("10.0.0.0/16")
+        val net10_24 = IpRange.parse("10.0.0.0/24")
+        val net2001_db8_48 = IpRange.parse( "2001:db8::/48")
+        val net2001_db8_64 = IpRange.parse( "2001:db8::/64")
+
+        // place them in the map
+        map.put(net10_16, "net10_16" )
+        map.put(net10_24, "net10_24" )
+        map.put(net2001_db8_48, "net2001_db8_48" )
+        map.put(net2001_db8_64, "net2001_db8_64" )
+
+        // find the networks
+        map.findExact( IpRange.parse( "10.0.0.0/16" ) ) shouldBe "net10_16"
+        map.findExact( IpRange.parse( "10.0.0.0/24" ) ) shouldBe "net10_24"
+        map.findExact( IpRange.parse( "2001:db8::/48" ) ) shouldBe "net2001_db8_48"
+        map.findExact( IpRange.parse( "2001:db8::/64" ) ) shouldBe "net2001_db8_64"
+    }
+
 })
