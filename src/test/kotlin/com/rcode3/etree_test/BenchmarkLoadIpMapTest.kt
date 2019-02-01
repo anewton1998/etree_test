@@ -4,6 +4,7 @@ import io.kotlintest.Spec
 import io.kotlintest.specs.ShouldSpec
 import java.io.File
 import java.io.OutputStream
+import java.util.*
 
 /**
  * Does benchmarks of loading the data.
@@ -31,8 +32,11 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
 
     init {
 
-        should( "load IP map" ) {
+        should( "load IP map" ).config(invocations = 5) {
+            var startTime = Date()
             loadIpMapFromJsonLines( tmpFile?.absolutePath ?: "no tmpFile" )
+            val duration = Date().time - startTime.time
+            println( "Test time was $duration")
         }
 
     }
