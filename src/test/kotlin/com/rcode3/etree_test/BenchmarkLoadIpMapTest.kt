@@ -11,33 +11,52 @@ import java.util.*
  */
 class BenchmarkLoadIpMapTest : ShouldSpec() {
 
-    var tmpFile : File? = null
+    var jsonLinesFile : File? = null
+    var psvFile       : File? = null
 
     override fun beforeSpec(spec: Spec) {
         //copy the resource to a temp location
         val classLoader = javaClass.classLoader
-        val resource = classLoader.getResource( "net_addr.jsonlines" )
-        tmpFile = createTempFile( "net_addr", "jsonlines" )
+        var resource = classLoader.getResource( "net_addr.jsonlines" )
+        jsonLinesFile = createTempFile( "net_addr", "jsonlines" )
 
-        val inputStream = resource.openStream()
-        val outputStream = tmpFile?.outputStream()
+        var inputStream = resource.openStream()
+        var outputStream = jsonLinesFile?.outputStream()
+        inputStream.copyTo( outputStream as OutputStream )
+        inputStream.close()
+        outputStream.close()
+
+        resource = classLoader.getResource( "net_addr.psv" )
+        psvFile = createTempFile( "net_addr", "psv" )
+
+        inputStream = resource.openStream()
+        outputStream = psvFile?.outputStream()
         inputStream.copyTo( outputStream as OutputStream )
         inputStream.close()
         outputStream.close()
     }
 
     override fun afterSpec(spec: Spec) {
-        tmpFile?.delete()
+        jsonLinesFile?.delete()
+        psvFile?.delete()
     }
 
     init {
 
-        should( "load IP map" ).config(invocations = 5) {
-            var startTime = Date()
-            loadIpMapFromJsonLines( tmpFile?.absolutePath ?: "no tmpFile" )
+        should( "time load of IP map from jsonlines" ).config(invocations = 5) {
+            val startTime = Date()
+            loadIpMapFromJsonLines( jsonLinesFile?.absolutePath ?: "no jasonLinesFile" )
             val duration = Date().time - startTime.time
             println( "Test time was $duration")
         }
 
+        should( "time laod of IP map from PSV" ).config( invocations = 5 ) {
+
+            val startTime = Date()
+            loadIpMapFromPsv( psvFile?.absolutePath ?: "no jasonLinesFile" )
+            val duration = Date().time - startTime.time
+            println( "Test time was $duration")
+
+        }
     }
 }
