@@ -39,6 +39,7 @@ tasks.withType<Test> {
     testLogging {
         events("passed", "skipped", "failed")
     }
+    maxHeapSize = "2g"
 }
 
 tasks.withType<Wrapper> {
