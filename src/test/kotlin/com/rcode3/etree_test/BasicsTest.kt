@@ -2,12 +2,15 @@ package com.rcode3.etree_test
 
 import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.ShouldSpec
+import net.ripe.ipresource.IpAddress
 import net.ripe.ipresource.IpRange
 import net.ripe.ipresource.Ipv4Address
 import net.ripe.ipresource.Ipv6Address
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy
 import net.ripe.ipresource.etree.NestedIntervalMap
+import java.lang.IllegalArgumentException
 
 /**
  * Demonstrates how to use Etree.
@@ -75,6 +78,46 @@ class BasicsTest : ShouldSpec( {
         net.start shouldBe Ipv6Address.parse( "2001:db8::" )
         net.end shouldBe Ipv6Address.parse( "2001:db8::ffff:ffff:ffff:ffff" )
 
+    }
+
+    should( "not parse single IPv4s as an IPRange" ) {
+        shouldThrow<IllegalArgumentException> {
+            IpRange.parse( "10.0.0.0" )
+        }
+        shouldThrow<IllegalArgumentException> {
+            IpRange.parse( "10.255.255.255" )
+        }
+    }
+
+    should( "not parse single IPv6s as an IPRange" ) {
+        shouldThrow<IllegalArgumentException> {
+            IpRange.parse( "2001:db8::")
+        }
+        shouldThrow<IllegalArgumentException> {
+            IpRange.parse( "2001:db8::ffff:ffff:ffff:ffff")
+        }
+    }
+
+    should( "put construct IPRange from IPAddress" ) {
+        var ip = IpAddress.parse( "10.0.0.0" )
+        var range = IpRange.range( ip, ip )
+        range.start shouldBe ip
+        range.end shouldBe ip
+
+        ip = IpAddress.parse( "10.255.255.255" )
+        range = IpRange.range( ip, ip )
+        range.start shouldBe ip
+        range.end shouldBe ip
+
+        ip = IpAddress.parse( "2001:db8::")
+        range = IpRange.range( ip, ip )
+        range.start shouldBe ip
+        range.end shouldBe ip
+
+        ip= IpAddress.parse( "2001:db8::ffff:ffff:ffff:ffff")
+        range = IpRange.range( ip, ip )
+        range.start shouldBe ip
+        range.end shouldBe ip
     }
 
     should( "build a network of Ip Networks" ) {
