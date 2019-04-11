@@ -58,7 +58,7 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
         should( "time laod of IP map from PSV" ).config( invocations = 5 ) {
 
             beforeBenchmark()
-            map = loadIpMapFromPsv( psvFile?.absolutePath ?: "no jasonLinesFile" )
+            map = loadIpMapFromPsv( psvFile?.absolutePath ?: "no psvFile" )
             afterBenchmark()
 
         }
@@ -69,6 +69,8 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
      * instead.
      */
     fun beforeBenchmark() {
+        println( "------")
+        println( this.javaClass )
         startTime = Date()
     }
 
@@ -83,5 +85,6 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
         println( "Used memory  : ${runtime.totalMemory() - runtime.freeMemory()}")
         println( "Free memory  : ${runtime.freeMemory()}")
         println( "Total memory : ${runtime.totalMemory()}")
+        println( "------")
     }
 }

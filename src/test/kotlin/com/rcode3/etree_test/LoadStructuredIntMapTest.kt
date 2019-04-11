@@ -10,7 +10,7 @@ import java.io.File.createTempFile
 /**
  * Does a basic test of loading a map for a JSON Lines file.
  */
-class LoadIpMapTest : ShouldSpec () {
+class LoadStructuredIntMapTest : ShouldSpec () {
 
     var jasonLinesFile : File? = null
     var psvFile        : File? = null
@@ -19,14 +19,26 @@ class LoadIpMapTest : ShouldSpec () {
         //copy the resource to a temp location
         val classLoader = javaClass.classLoader
         var resource = classLoader.getResource( "loadipmaptest.jsonlines" )
-        var data = resource.readText()
-        jasonLinesFile = createTempFile( "loadipmaptest", "jsonlines" )
-        jasonLinesFile?.writeText( data )
+        jasonLinesFile = createTempFile( "loadstructuredintmaptest", "jsonlines" )
+        val jsonOut = jasonLinesFile?.outputStream()?.bufferedWriter()
+        if (jsonOut != null) {
+            convertIpToStructuredIntJsonLines( resource.openStream().bufferedReader(), jsonOut )
+        }
+        jsonOut?.close()
+        println( "---converted jsonlines" )
+        println( jasonLinesFile?.readText() )
+        println( "---" )
 
         resource = classLoader.getResource( "loadipmaptest.psv" )
-        data = resource.readText()
-        psvFile = createTempFile( "loadipmaptest", "psv" )
-        psvFile?.writeText( data )
+        psvFile = createTempFile( "loadstructuredintmaptest", "psv" )
+        val psvOut = psvFile?.outputStream()?.bufferedWriter()
+        if (psvOut != null) {
+            convertIpToStructuredIntPsv( resource.openStream().reader(), psvOut )
+        }
+        psvOut?.close()
+        println( "---converted psv" )
+        println( psvFile?.readText() )
+        println( "---" )
     }
 
     override fun afterSpec(spec: Spec) {
@@ -36,17 +48,17 @@ class LoadIpMapTest : ShouldSpec () {
 
     init {
 
-        should( "parse loadipmaptest.jsonlines" ) {
+        should( "parse loadstructuredintmaptest.jsonlines" ) {
 
-            val map = loadIpMapFromJsonLines( jasonLinesFile?.absolutePath ?: "no jasonLinesFile" )
+            val map = loadStructuredIntMapFromJsonLines( jasonLinesFile?.absolutePath ?: "no jasonLinesFile" )
             map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ) shouldBe "NET6-2610-E0-1"
             map.findExact( IpRange.parse( "209.136.123.000/24" ) ) shouldBe "NET-209-136-123-0-1"
 
         }
 
-        should( "parse loadipmaptest.psv" ) {
+        should( "parse loadstructuredintmaptest.psv" ) {
 
-            val map = loadIpMapFromPsv( psvFile?.absolutePath ?: "no psvFile" )
+            val map = loadStructuredIntMapFromPsv( psvFile?.absolutePath ?: "no psvFile" )
             map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ) shouldBe "NET6-2610-E0-1"
             map.findExact( IpRange.parse( "209.136.123.000/24" ) ) shouldBe "NET-209-136-123-0-1"
 

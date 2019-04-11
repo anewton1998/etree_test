@@ -4,10 +4,7 @@ import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.ShouldSpec
-import net.ripe.ipresource.IpAddress
-import net.ripe.ipresource.IpRange
-import net.ripe.ipresource.Ipv4Address
-import net.ripe.ipresource.Ipv6Address
+import net.ripe.ipresource.*
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy
 import net.ripe.ipresource.etree.NestedIntervalMap
 import java.lang.IllegalArgumentException
@@ -102,6 +99,28 @@ class BasicsTest : ShouldSpec( {
         shouldThrow<IllegalArgumentException> {
             IpRange.parse( "2001:db8::ffff:ffff:ffff:ffff")
         }
+    }
+
+    should( "be represented as a long for IPv4" ) {
+        val ip = Ipv4Address.parse( "10.0.0.0" )
+        val value = ip.longValue()
+        val ip2 = Ipv4Address( value )
+        ip2 shouldBe Ipv4Address.parse( "10.0.0.0" )
+    }
+
+    should( "be represented as a bigint for IPv6" ) {
+        val ip = Ipv6Address.parse( "2001:db8::" )
+        val value = ip.value
+        val ip2 = Ipv6Address( value )
+        ip2 shouldBe Ipv6Address.parse( "2001:db8::" )
+    }
+
+    should( "get and set resource type" ) {
+        val v4 = IpResourceType.IPv4
+        v4 shouldBe IpResourceType.valueOf( v4.code )
+
+        val v6 = IpResourceType.IPv6
+        v6 shouldBe IpResourceType.valueOf( v6.code )
     }
 
     should( "put construct IPRange from IPAddress" ) {
