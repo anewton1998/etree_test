@@ -25,8 +25,8 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
         val classLoader = javaClass.classLoader
         var resource = classLoader.getResource( "net_addr.jsonlines" )
         jsonLinesFile = createTempFile( "net_addr_structured_int", "jsonlines" )
-        val jsonOut = jsonLinesFile?.outputStream()?.bufferedWriter()
-        var resourceIn = resource.openStream().bufferedReader()
+        val jsonOut = jsonLinesFile?.outputStream()?.writer()
+        var resourceIn = resource.openStream().reader()
         if (jsonOut != null) {
             convertIpToStructuredIntJsonLines( resourceIn, jsonOut )
         }
@@ -35,8 +35,8 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
 
         resource = classLoader.getResource( "net_addr.psv" )
         psvFile = createTempFile( "net_addr_structured_int", "psv" )
-        val psvOut = psvFile?.outputStream()?.bufferedWriter()
-        resourceIn = resource.openStream().bufferedReader()
+        val psvOut = psvFile?.outputStream()?.writer()
+        resourceIn = resource.openStream().reader()
         if (psvOut != null) {
             convertIpToStructuredIntPsv( resource.openStream().reader(), psvOut )
         }
