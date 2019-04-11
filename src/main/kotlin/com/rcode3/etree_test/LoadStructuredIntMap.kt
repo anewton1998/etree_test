@@ -23,9 +23,9 @@ data class IntLine (
  * {"type":"ipResourceType.code","value":"xxxx","cidr_prefix":32,"net_handle":"NET6-2610-E0-1"}
  * ```
  */
-fun loadStructuredIntMapFromJsonLines( fileName: String ) : NestedIntervalMap<IpRange,String> {
+fun loadStructuredIntMapFromJsonLines( fileName: String ) : IpMap {
 
-    val map = NestedIntervalMap<IpRange,String>( IpResourceIntervalStrategy.getInstance() )
+    val map = IpMap( IpResourceIntervalStrategy.getInstance() )
 
     val mapper = jacksonObjectMapper()
 
@@ -40,7 +40,8 @@ fun loadStructuredIntMapFromJsonLines( fileName: String ) : NestedIntervalMap<Ip
             else ->
                 throw RuntimeException( "illegal network type" )
         }
-        map.put( IpRange.prefix( net, line.cidr_prefix ), line.net_handle )
+        val ipRange = IpRange.prefix( net, line.cidr_prefix )
+        map.put( ipRange, IpData( ipRange, line.net_handle ) )
     }
 
     return map
@@ -53,9 +54,9 @@ fun loadStructuredIntMapFromJsonLines( fileName: String ) : NestedIntervalMap<Ip
  * ipResourceType.code|xxxxx|32|NET6...
  * ```
  */
-fun loadStructuredIntMapFromPsv( fileName: String ) : NestedIntervalMap<IpRange,String> {
+fun loadStructuredIntMapFromPsv( fileName: String ) : IpMap {
 
-    val map = NestedIntervalMap<IpRange,String>( IpResourceIntervalStrategy.getInstance() )
+    val map = IpMap( IpResourceIntervalStrategy.getInstance() )
 
     File( fileName ).forEachLine { s ->
         val parts = s.split( '|' )
@@ -68,17 +69,36 @@ fun loadStructuredIntMapFromPsv( fileName: String ) : NestedIntervalMap<IpRange,
             else ->
                 throw RuntimeException( "illegal network type" )
         }
-        map.put( IpRange.prefix( net, parts[ 2 ].toInt() ), parts[ 3 ] )
+        val ipRange = IpRange.prefix( net, parts[ 2 ].toInt() )
+        map.put( ipRange, IpData( ipRange, parts[ 3 ] ) )
     }
 
     return map
 }
 
-fun saveStructuredIntMaptoPsv( fileName: String, map : NestedIntervalMap<IpRange,String> ) {
+fun saveStructuredIntMapToPsv( fileName: String, map : IpMap ) {
     val v4s = map.findAllMoreSpecific( IpRange.parse( "0.0.0.0/0" ) )
     val v6s = map.findAllMoreSpecific( IpRange.parse( "::0/0" ) )
+    val writer = File( fileName ).outputStream().writer()
+    saveStructuredIntMapToPsv( writer, v4s )
+    saveStructuredIntMapToPsv( writer, v6s )
+    writer.close()
 }
 
+fun saveStructuredIntMapToPsv( writer: Writer, data : List<IpData>) {
+
+    data.forEach { ipData ->
+        val value = when( ipData.first.start.type ) {
+            IpResourceType.IPv4 ->
+                (ipData.first.start as Ipv4Address).longValue().toString()
+            IpResourceType.IPv6 ->
+                (ipData.first.start as Ipv6Address).value.toString()
+            else ->
+                throw RuntimeException( "illegal network type of ${ipData.first.start.type}" )
+        }
+        writer.write( "${ipData.first.type.code}|${value}|${ipData.first.prefixLength}|${ipData.second}\n")
+    }
+}
 
 fun convertIpToStructuredIntJsonLines(input: Reader, output: Writer) {
     val mapper = jacksonObjectMapper()

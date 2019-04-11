@@ -18,7 +18,7 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
     var psvFile       : File? = null
 
     var startTime = Date()
-    var map : NestedIntervalMap<IpRange,String>? = null
+    var map : IpMap? = null
 
     override fun beforeSpec(spec: Spec) {
         //copy the resource to a temp location
@@ -69,6 +69,7 @@ class BenchmarkLoadIpMapTest : ShouldSpec() {
      * instead.
      */
     fun beforeBenchmark() {
+        System.gc()
         println( "------")
         println( this.javaClass )
         startTime = Date()

@@ -17,7 +17,7 @@ class BenchmarkLookupTest : ShouldSpec() {
     var jsonLinesFile : File? = null
 
     var startTime = Date()
-    var map : NestedIntervalMap<IpRange, String>? = null
+    var map : IpMap? = null
 
     var ips : List<String>? = null
 
@@ -61,6 +61,7 @@ class BenchmarkLookupTest : ShouldSpec() {
      * instead.
      */
     fun beforeBenchmark() {
+        System.gc()
         println( "------")
         println( this.javaClass )
         startTime = Date()

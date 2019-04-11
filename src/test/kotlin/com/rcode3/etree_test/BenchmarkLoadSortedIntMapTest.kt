@@ -1,21 +1,18 @@
 package com.rcode3.etree_test
 
-import arrow.core.toT
 import io.kotlintest.Spec
 import io.kotlintest.specs.ShouldSpec
-import net.ripe.ipresource.IpRange
-import net.ripe.ipresource.etree.NestedIntervalMap
 import java.io.File
-import java.io.OutputStream
 import java.util.*
 
 /**
  * Does benchmarks of loading the data.
  */
-class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
+class BenchmarkLoadSortedIntMapTest : ShouldSpec() {
 
     var jsonLinesFile : File? = null
     var psvFile       : File? = null
+    var sortedPsvFile : File? = null
 
     var startTime = Date()
     var map : IpMap? = null
@@ -24,7 +21,7 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
         //copy the resource to a temp location
         val classLoader = javaClass.classLoader
         var resource = classLoader.getResource( "net_addr.jsonlines" )
-        jsonLinesFile = createTempFile( "net_addr_structured_int", "jsonlines" )
+        jsonLinesFile = createTempFile( "net_addr_unsorted_int", "jsonlines" )
         val jsonOut = jsonLinesFile?.outputStream()?.bufferedWriter()
         var resourceIn = resource.openStream().bufferedReader()
         if (jsonOut != null) {
@@ -34,7 +31,7 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
         resourceIn.close()
 
         resource = classLoader.getResource( "net_addr.psv" )
-        psvFile = createTempFile( "net_addr_structured_int", "psv" )
+        psvFile = createTempFile( "net_addr_unsorted_int", "psv" )
         val psvOut = psvFile?.outputStream()?.bufferedWriter()
         resourceIn = resource.openStream().bufferedReader()
         if (psvOut != null) {
@@ -42,6 +39,10 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
         }
         psvOut?.close()
         resourceIn.close()
+
+        map = loadStructuredIntMapFromPsv( psvFile?.absolutePath ?: "no psvfile"  )
+        sortedPsvFile = createTempFile( "net_addr_sorted_int", "psv" )
+        saveStructuredIntMapToPsv(sortedPsvFile?.absolutePath!!, map!!)
     }
 
     override fun afterSpec(spec: Spec) {
@@ -51,15 +52,9 @@ class BenchmarkLoadStructuredIntMapTest : ShouldSpec() {
 
     init {
 
-        should( "time load of structured int map from jsonlines" ).config(invocations = 5) {
+        should( "time load of sorted structured int map from PSV" ).config( invocations = 5 ) {
             beforeBenchmark()
-            map = loadStructuredIntMapFromJsonLines( jsonLinesFile?.absolutePath ?: "no jasonLinesFile" )
-            afterBenchmark()
-        }
-
-        should( "time load of structured int map from PSV" ).config( invocations = 5 ) {
-            beforeBenchmark()
-            map = loadStructuredIntMapFromPsv( psvFile?.absolutePath ?: "no psvFile" )
+            map = loadStructuredIntMapFromPsv( sortedPsvFile?.absolutePath ?: "no psvFile" )
             afterBenchmark()
         }
     }

@@ -39,16 +39,16 @@ class LoadIpMapTest : ShouldSpec () {
         should( "parse loadipmaptest.jsonlines" ) {
 
             val map = loadIpMapFromJsonLines( jasonLinesFile?.absolutePath ?: "no jasonLinesFile" )
-            map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ) shouldBe "NET6-2610-E0-1"
-            map.findExact( IpRange.parse( "209.136.123.000/24" ) ) shouldBe "NET-209-136-123-0-1"
+            map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ).second shouldBe "NET6-2610-E0-1"
+            map.findExact( IpRange.parse( "209.136.123.000/24" ) ).second shouldBe "NET-209-136-123-0-1"
 
         }
 
         should( "parse loadipmaptest.psv" ) {
 
             val map = loadIpMapFromPsv( psvFile?.absolutePath ?: "no psvFile" )
-            map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ) shouldBe "NET6-2610-E0-1"
-            map.findExact( IpRange.parse( "209.136.123.000/24" ) ) shouldBe "NET-209-136-123-0-1"
+            map.findExact( IpRange.parse( "2610:00E0:0000:0000:0000:0000:0000:0000/32" ) ).second shouldBe "NET6-2610-E0-1"
+            map.findExact( IpRange.parse( "209.136.123.000/24" ) ).second shouldBe "NET-209-136-123-0-1"
 
         }
     }
